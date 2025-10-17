@@ -1,7 +1,7 @@
 #!/bin/bash
 mkdir -p /app/hls
 
-INPUT="https://webiptvsite/foxtelpvt.php/c1566607e84d4dd0bc7e53bc26943d14/index.mpd"
+INPUT="https://webiptv.site/foxtelpvt.php/c1566607e84d4dd0bc7e53bc26943d14/index.mpd"
 KEY="a2ba14ee5ef4440d8e56a8bb5403117d:b77a334fd7aff9c9960ca7785a20ea66"
 
 PORT=${PORT:-10000}
