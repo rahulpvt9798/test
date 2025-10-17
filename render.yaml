@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: dash-to-hls-1080p
+    name: live-m3u8-proxy
     env: docker
     plan: free
     dockerfilePath: ./Dockerfile
