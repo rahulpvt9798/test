@@ -1,29 +1,45 @@
 #!/bin/bash
 set -e
 
-# Create HLS folder
-mkdir -p /app/hls
-
-# DASH input + ClearKey
-INPUT="https://webiptv.site/foxtelpvt.php/c1566607e84d4dd0bc7e53bc26943d14/index.mpd"
-KEY="a2ba14ee5ef4440d8e56a8bb5403117d:b77a334fd7aff9c9960ca7785a20ea66"
-
-# Render free plan port
 PORT=${PORT:-10000}
+LIVE_DIR="/app/live"
 
-# FFmpeg: single 1080p HLS
-ffmpeg -allowed_extensions ALL \
-  -decryption_key "$KEY" \
-  -i "$INPUT" \
-  -c:v libx264 -b:v 5000k -s 1920x1080 -r 50 \
-  -c:a aac -b:a 128k -ar 48000 -ac 2 \
-  -f hls \
-  -hls_time 6 \
-  -hls_list_size 10 \
-  -hls_flags delete_segments+append_list \
-  -hls_segment_filename "/app/hls/1080p_%03d.ts" \
-  /app/hls/1080p.m3u8
+mkdir -p $LIVE_DIR
 
-# Serve via nginx
-echo "server { listen $PORT; root /app/hls; autoindex on; }" > /etc/nginx/conf.d/default.conf
+# Number of segments to keep
+SEGMENTS=5
+
+# Base TS URL
+TS_URL="http://agh2019.xyz:80/live/SOFIANBENAISSA/X7KJL94/83174.ts"
+
+# Start a loop to fetch TS segments
+counter=0
+while true; do
+    segment=$(printf "seg_%03d.ts" $counter)
+    curl -s "$TS_URL" -o "$LIVE_DIR/$segment"
+
+    # Remove old segments
+    oldest=$((counter-SEGMENTS))
+    if [ $oldest -ge 0 ]; then
+        rm -f "$LIVE_DIR/seg_$(printf "%03d" $oldest).ts"
+    fi
+
+    # Generate .m3u8 playlist
+    echo "#EXTM3U" > "$LIVE_DIR/live.m3u8"
+    echo "#EXT-X-VERSION:3" >> "$LIVE_DIR/live.m3u8"
+    echo "#EXT-X-TARGETDURATION:6" >> "$LIVE_DIR/live.m3u8"
+    echo "#EXT-X-MEDIA-SEQUENCE:$((counter>=SEGMENTS?counter-SEGMENTS+1:0))" >> "$LIVE_DIR/live.m3u8"
+
+    for i in $(seq $((counter-SEGMENTS+1)) $counter); do
+        [ $i -lt 0 ] && continue
+        echo "#EXTINF:6.0," >> "$LIVE_DIR/live.m3u8"
+        echo "seg_$(printf "%03d" $i).ts" >> "$LIVE_DIR/live.m3u8"
+    done
+
+    counter=$((counter+1))
+    sleep 5
+done &
+
+# Serve HLS via nginx
+echo "server { listen $PORT; root $LIVE_DIR; autoindex on; }" > /etc/nginx/conf.d/default.conf
 nginx -g 'daemon off;'
