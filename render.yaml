@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: dash-to-hls-multi
+    name: dash-to-hls-1080p
     env: docker
     plan: free
     dockerfilePath: ./Dockerfile
