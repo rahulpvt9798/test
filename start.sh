@@ -1,9 +1,10 @@
 #!/bin/bash
 set -e
 
+# Create HLS folder
 mkdir -p /app/hls
 
-# Input DASH + ClearKey
+# DASH input + ClearKey
 INPUT="https://webiptv.site/foxtelpvt.php/c1566607e84d4dd0bc7e53bc26943d14/index.mpd"
 KEY="a2ba14ee5ef4440d8e56a8bb5403117d:b77a334fd7aff9c9960ca7785a20ea66"
 
