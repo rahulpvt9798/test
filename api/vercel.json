@@ -1,9 +1,15 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "api/index.php",
+      "use": "vercel-php"
+    }
+  ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/index.js"
+      "src": "/(.*)",
+      "dest": "api/index.php"
     }
   ],
   "regions": ["sin1"]
