@@ -11,12 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 $url = "https://linearjitp-playback.astro.com.my/dash-wv/linear/";
 
-$headers = [
-    "User-Agent: Mozilla/5.0 (Linux; Android 10; MI 9 Build/QKQ1.190825.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/111.0.5563.58 Mobile Safari/537.36",
-    "Referer: https://astro.com.my/",
-    "Origin: https://astro.com.my"
-];
-
 $ch = curl_init();
 
 curl_setopt_array($ch, [
@@ -24,7 +18,11 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_FOLLOWLOCATION => true,
     CURLOPT_SSL_VERIFYPEER => false,
-    CURLOPT_HTTPHEADER => $headers
+    CURLOPT_HTTPHEADER => [
+        "User-Agent: Mozilla/5.0 (Linux; Android 10; MI 9 Build/QKQ1.190825.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/111.0.5563.58 Mobile Safari/537.36",
+        "Referer: https://astro.com.my/",
+        "Origin: https://astro.com.my"
+    ]
 ]);
 
 $response = curl_exec($ch);
